@@ -24,6 +24,22 @@ ctest --test-dir build --output-on-failure
 ./scripts/verify_tutorial.sh
 ```
 
+## OpenSSL 源码探索
+
+普通构建链接系统 OpenSSL，不会下载源码。需要学习内部模块时，启用独立的
+FetchContent 构建目录：
+
+```sh
+cmake -S . -B build-source -DOPENSSL_FETCH_SOURCE=ON
+cmake --build build-source --target openssl_source_index
+cmake --build build-source --target openssl_source_verify
+ctest --test-dir build-source -R openssl_source_structure --output-on-failure
+```
+
+源码会经过固定 SHA-256 校验，随后生成
+`build-source/openssl-source-index.md`。如果已经有 OpenSSL 3.0.2 源码，可用
+`-DOPENSSL_SOURCE_OVERRIDE=/path/to/source` 进行离线探索。
+
 如果系统没有 Ninja，CMake 会自动使用可用的 Make 后端。OpenSSL 开发头文件通常由发行版的 `libssl-dev`/对应开发包提供。
 
 ## 学习顺序
