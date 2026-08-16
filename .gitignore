@@ -1,4 +1,5 @@
 /build/
+/build-*/
 /.cache/
 *.o
 *.so
@@ -8,4 +9,3 @@
 *.key
 *.crt
 *.csr
-

@@ -16,7 +16,6 @@ function(openssl_enable_source_explorer)
         FetchContent_Declare(openssl_source
             URL "https://github.com/openssl/openssl/archive/refs/tags/${_openssl_tag}.tar.gz"
             URL_HASH "SHA256=${_openssl_sha256}"
-            DOWNLOAD_EXTRACT_TIMESTAMP TRUE
             TIMEOUT 180
         )
         FetchContent_GetProperties(openssl_source)
@@ -59,6 +58,17 @@ function(openssl_enable_source_explorer)
                 "Build the index target, then read: ${_index}"
         VERBATIM
     )
+
+    add_custom_target(openssl_source_verify
+        COMMAND "${CMAKE_SOURCE_DIR}/scripts/verify_openssl_source.sh"
+                "${_openssl_source}"
+        COMMENT "Verifying expected OpenSSL 3.0.2 module and symbol layout"
+        VERBATIM
+    )
+
+    add_test(NAME openssl_source_structure
+        COMMAND "${CMAKE_SOURCE_DIR}/scripts/verify_openssl_source.sh"
+                "${_openssl_source}")
 
     message(STATUS "OpenSSL source explorer enabled: ${_openssl_source}")
     message(STATUS
