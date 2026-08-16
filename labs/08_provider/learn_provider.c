@@ -1,20 +1,22 @@
 /*
  * 教学用 Provider：LEARN-TOY-DIGEST 不是密码学安全摘要。
- * 它只用于展示 OpenSSL 3.x 的 Provider/Core/Dispatch 接口形状。
+ * 它故意只维护一个简单的 32 位状态，用来展示 OpenSSL 3.x 的
+ * Core -> Provider dispatch 形状。绝不能用于真实密码学或 FIPS。
  */
-#include <openssl/core_dispatch.h>
-#include <openssl/core_names.h>
-#include <openssl/params.h>
+#include <openssl/core_dispatch.h> /* OSSL_FUNC_*、OSSL_ALGORITHM */
+#include <openssl/core_names.h>    /* OSSL_DIGEST_PARAM_* */
+#include <openssl/params.h>        /* OSSL_PARAM_* */
 
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
 typedef struct {
-    uint32_t state;
-    size_t count;
+    uint32_t state; /* 玩具状态，不是安全摘要内部状态 */
+    size_t count;   /* 已处理的输入长度 */
 } TOY_CTX;
 
+/* EVP_MD_CTX 创建时，Core 会通过 dispatch 调用 provider 的 newctx。 */
 static void *toy_newctx(void *provctx) {
     (void)provctx;
     return calloc(1, sizeof(TOY_CTX));
@@ -24,6 +26,7 @@ static void toy_freectx(void *vctx) {
     free(vctx);
 }
 
+/* EVP 复制上下文时需要独立的内存，不能返回原指针。 */
 static void *toy_dupctx(void *vctx) {
     TOY_CTX *copy = malloc(sizeof(TOY_CTX));
     if (copy != NULL) {
@@ -32,6 +35,7 @@ static void *toy_dupctx(void *vctx) {
     return copy;
 }
 
+/* Init 重置一次摘要操作的状态；params 可用于接收算法参数。 */
 static int toy_init(void *vctx, const OSSL_PARAM params[]) {
     TOY_CTX *ctx = vctx;
     (void)params;
@@ -40,6 +44,7 @@ static int toy_init(void *vctx, const OSSL_PARAM params[]) {
     return 1;
 }
 
+/* Update 可能被 EVP 多次调用，必须支持任意分块边界。 */
 static int toy_update(void *vctx, const unsigned char *data, size_t datalen) {
     TOY_CTX *ctx = vctx;
     for (size_t i = 0; i < datalen; ++i) {
@@ -50,6 +55,7 @@ static int toy_update(void *vctx, const unsigned char *data, size_t datalen) {
     return 1;
 }
 
+/* Final 把内部状态编码为固定 32 字节；这里只是教学输出。 */
 static int toy_final(void *vctx, unsigned char *out, size_t *outl,
                      size_t outsz) {
     TOY_CTX *ctx = vctx;
@@ -64,6 +70,7 @@ static int toy_final(void *vctx, unsigned char *out, size_t *outl,
     return 1;
 }
 
+/* Core 询问 provider 支持哪些 digest 参数时会调用这个函数。 */
 static const OSSL_PARAM *toy_gettable_params(void *provctx) {
     static const OSSL_PARAM params[] = {
         OSSL_PARAM_size_t(OSSL_DIGEST_PARAM_SIZE, NULL),
@@ -74,6 +81,7 @@ static const OSSL_PARAM *toy_gettable_params(void *provctx) {
     return params;
 }
 
+/* Core 真正读取参数值时调用；只填写它询问的字段。 */
 static int toy_get_params(OSSL_PARAM params[]) {
     OSSL_PARAM *p = OSSL_PARAM_locate(params, OSSL_DIGEST_PARAM_SIZE);
     if (p != NULL && !OSSL_PARAM_set_size_t(p, 32)) {
@@ -86,6 +94,7 @@ static int toy_get_params(OSSL_PARAM params[]) {
     return 1;
 }
 
+/* 这个表把“操作编号”映射到 provider 函数。 */
 static const OSSL_DISPATCH toy_digest_functions[] = {
     { OSSL_FUNC_DIGEST_NEWCTX, (void (*)(void))toy_newctx },
     { OSSL_FUNC_DIGEST_FREECTX, (void (*)(void))toy_freectx },
@@ -98,12 +107,14 @@ static const OSSL_DISPATCH toy_digest_functions[] = {
     { 0, NULL }
 };
 
+/* name 可以包含别名；property definition 用于 EVP fetch 过滤。 */
 static const OSSL_ALGORITHM toy_digests[] = {
     { "LEARN-TOY-DIGEST:LEARN-TOY", "provider=learn", toy_digest_functions,
       "Educational non-cryptographic digest" },
     { NULL, NULL, NULL, NULL }
 };
 
+/* Core 按 operation 查询 provider 提供的算法集合。 */
 static const OSSL_ALGORITHM *toy_query(void *provctx, int operation,
                                        int *no_cache) {
     (void)provctx;
@@ -142,6 +153,10 @@ static const OSSL_DISPATCH toy_provider_functions[] = {
     { 0, NULL }
 };
 
+/*
+ * 这是 provider 模块的入口。Core 将自己的 dispatch 表通过 in 传入，
+ * provider 返回 out；本示例没有使用 Core 服务，所以不读取 in。
+ */
 int OSSL_provider_init(const OSSL_CORE_HANDLE *handle,
                        const OSSL_DISPATCH *in,
                        const OSSL_DISPATCH **out,
