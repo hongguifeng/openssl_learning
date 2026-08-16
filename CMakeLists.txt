@@ -10,4 +10,6 @@ find_package(OpenSSL 3 REQUIRED COMPONENTS Crypto SSL)
 enable_testing()
 add_subdirectory(labs/01_hello)
 add_subdirectory(labs/03_evp)
-
+add_subdirectory(labs/04_keys)
+add_subdirectory(labs/07_tls)
+add_subdirectory(labs/08_provider)

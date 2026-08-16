@@ -1,0 +1,11 @@
+/build/
+/.cache/
+*.o
+*.so
+*.dylib
+*.dll
+*.pem
+*.key
+*.crt
+*.csr
+
