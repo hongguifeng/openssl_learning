@@ -7,6 +7,16 @@ set(CMAKE_C_EXTENSIONS OFF)
 
 find_package(OpenSSL 3 REQUIRED COMPONENTS Crypto SSL)
 
+option(OPENSSL_FETCH_SOURCE
+    "Fetch the pinned OpenSSL source tree for architecture exploration" OFF)
+set(OPENSSL_SOURCE_OVERRIDE "" CACHE PATH
+    "Use an existing OpenSSL source tree instead of downloading it")
+
+if(OPENSSL_FETCH_SOURCE)
+    include(cmake/OpenSSLSourceExplorer.cmake)
+    openssl_enable_source_explorer()
+endif()
+
 enable_testing()
 add_subdirectory(labs/01_hello)
 add_subdirectory(labs/03_evp)
