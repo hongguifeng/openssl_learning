@@ -52,3 +52,10 @@ openssl fipsinstall -help 2>/dev/null || true
 
 调试时可在应用入口、EVP fetch、provider 回调和 SSL 状态回调分别打印对象地址、算法名、属性和错误栈，形成“应用 → EVP → Core → Provider”的调用证据链。
 
+本仓库还提供了可执行的 GDB 追踪脚本：
+
+```sh
+./scripts/trace_provider_call_chain.sh
+```
+
+它会在 `EVP_MD_fetch` 和自定义 provider 的 `toy_update` 上设置断点，打印短回溯后继续运行。若目标系统没有调试器，可手动使用同名断点；断点不可用时应先检查是否保留调试符号以及 provider 是否从预期目录加载。
