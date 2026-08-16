@@ -18,6 +18,12 @@ cmake --build build
 ctest --test-dir build --output-on-failure
 ```
 
+也可以用一个命令执行环境检查、构建、现代 API 扫描和全部 CTest：
+
+```sh
+./scripts/verify_tutorial.sh
+```
+
 如果系统没有 Ninja，CMake 会自动使用可用的 Make 后端。OpenSSL 开发头文件通常由发行版的 `libssl-dev`/对应开发包提供。
 
 ## 学习顺序
@@ -42,4 +48,3 @@ ctest --test-dir build --output-on-failure
 - 所有实验都提供成功路径、失败路径和可验证的预期结果。
 - 教程中的密钥、口令和自签名证书只用于本地实验，不能直接用于生产设备。
 - STM32/FreeRTOS 章节给出移植边界和示例适配层；具体 HAL、网卡驱动和硬件熵源必须由目标项目实现。
-

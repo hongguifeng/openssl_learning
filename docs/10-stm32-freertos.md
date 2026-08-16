@@ -24,3 +24,11 @@ STM32 HAL/硬件
 
 本章正式实现时会提供不依赖具体板卡的适配接口头文件、FreeRTOS 伪实现和交叉编译模板；真正的 HAL、网卡和安全启动集成必须在目标工程完成。
 
+## 实验：先验证适配边界，再接入目标板
+
+1. 用 `cc -fsyntax-only embedded/openssl_freertos_port.h` 检查接口头文件；
+2. 在目标工程实现四类 hook，并为熵源失败、互斥超时和时间回退写单元测试；
+3. 用 `cmake/toolchains/stm32-gcc-example.cmake` 建立交叉编译工程，补充 MCU、链接脚本、FreeRTOS 和网络栈目标；
+4. 在板上记录 TLS 握手期间堆峰值、任务栈水位和 RNG 自检结果，再与主机回环实验结果对照。
+
+本仓库不伪造具体 STM32 型号的 HAL 实现；这一步必须由目标板卡和工具链验证。

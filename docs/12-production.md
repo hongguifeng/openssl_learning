@@ -10,3 +10,13 @@
 
 完成教程后，建议用一个真实设备通信模块复盘这份清单，并形成威胁模型、密钥生命周期文档和发布前测试报告。
 
+## 实验：发布前自审
+
+在提交产品代码前，至少执行：
+
+```sh
+./scripts/verify_tutorial.sh
+rg -n 'SSL_VERIFY_NONE|EVP_MD_fetch|OSSL_PROVIDER_load' .
+```
+
+对每个 `SSL_VERIFY_NONE` 逐处说明它是否仅存在于测试代码；对每个 provider/fetch 调用记录算法属性、配置来源和失败处理。最后把证书轮换、随机数不可用、错误主机名和断电恢复加入目标设备的测试报告。
