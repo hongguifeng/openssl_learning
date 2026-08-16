@@ -39,10 +39,11 @@ ctest --test-dir build --output-on-failure
 9. [第 8 章：Provider、FIPS 与源码调用链](docs/08-provider-fips.md)
 10. [第 8A 章：FetchContent 源码导览与接口设计](docs/08a-source-tour.md)
 11. [第 8B 章：对象内部结构与模块协作](docs/08b-internals-deep-dive.md)
-12. [第 9 章：版本演进与迁移](docs/09-versioning.md)
-13. [第 10 章：STM32/FreeRTOS 集成](docs/10-stm32-freertos.md)
-14. [第 11 章：调试、测试与性能](docs/11-testing.md)
-15. [第 12 章：生产安全清单](docs/12-production.md)
+12. [第 8C 章：BIO、X.509、RAND 与编解码模块](docs/08c-subsystem-map.md)
+13. [第 9 章：版本演进与迁移](docs/09-versioning.md)
+14. [第 10 章：STM32/FreeRTOS 集成](docs/10-stm32-freertos.md)
+15. [第 11 章：调试、测试与性能](docs/11-testing.md)
+16. [第 12 章：生产安全清单](docs/12-production.md)
 
 
 ## 推荐学习方法

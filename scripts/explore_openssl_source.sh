@@ -85,6 +85,15 @@ h_files=$(find "$src/include" -type f -name '*.h' | wc -l)
         'EVP_MD_fetch|EVP_DigestInit_ex|SSL_do_handshake|SSL_connect|SSL_read_ex|X509_verify_cert' \
         "$src/include/openssl" | head -40 || true
     echo '```'
+    echo
+    echo '## BIO, X.509, RAND and encoder/decoder paths'
+    echo
+    echo '```text'
+    rg -n --glob '*.c' \
+        'BIO_read_ex|BIO_write_ex|X509_verify_cert|build_chain|RAND_bytes_ex|EVP_RAND_fetch|OSSL_DECODER_CTX_new_for_pkey|OSSL_ENCODER_CTX_new_for_pkey' \
+        "$src/crypto/bio" "$src/crypto/x509" "$src/crypto/rand" \
+        "$src/crypto/evp" "$src/crypto/encode_decode" | head -80 || true
+    echo '```'
 } > "$out"
 
 printf 'OpenSSL source index written: %s\n' "$out"
